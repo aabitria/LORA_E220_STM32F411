@@ -61,6 +61,16 @@ void Error_Handler(void);
 #define BLUE_LED_GPIO_Port GPIOC
 #define WHITE_LED_Pin GPIO_PIN_12
 #define WHITE_LED_GPIO_Port GPIOB
+#define E220_M0_Pin GPIO_PIN_14
+#define E220_M0_GPIO_Port GPIOB
+#define E220_M1_Pin GPIO_PIN_15
+#define E220_M1_GPIO_Port GPIOB
+#define E220_AUX_Pin GPIO_PIN_8
+#define E220_AUX_GPIO_Port GPIOA
+#define E220_TX_Pin GPIO_PIN_9
+#define E220_TX_GPIO_Port GPIOA
+#define E220_RX_Pin GPIO_PIN_10
+#define E220_RX_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 

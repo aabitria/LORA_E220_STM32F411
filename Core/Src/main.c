@@ -18,7 +18,9 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "usart.h"
 #include "gpio.h"
+#include <string.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -65,6 +67,11 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+	uint8_t conf[3] = {0xC1, 0x00, 0x09};
+	uint8_t resp[16] = {0};
+	uint8_t wconf[16] = {0};
+	char payload[20] = "Hello World!";
+	uint8_t count = 0;
 
   /* USER CODE END 1 */
 
@@ -86,16 +93,76 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+//  HAL_GPIO_WritePin(E220_M0_GPIO_Port, E220_M0_Pin, GPIO_PIN_SET);
+//  HAL_GPIO_WritePin(E220_M1_GPIO_Port, E220_M1_Pin, GPIO_PIN_SET);
+//
+//  HAL_Delay(500);
+//  HAL_GPIO_WritePin(E220_M0_GPIO_Port, E220_M0_Pin, GPIO_PIN_RESET);
+//  HAL_GPIO_WritePin(E220_M1_GPIO_Port, E220_M1_Pin, GPIO_PIN_RESET);
+//
+//  conf[0] = 0xC1;
+//  conf[1] = 0x00;
+//  conf[2] = 0x09;
+//
+//  HAL_Delay(500);
+//  HAL_GPIO_WritePin(E220_M0_GPIO_Port, E220_M0_Pin, GPIO_PIN_SET);
+//  HAL_GPIO_WritePin(E220_M1_GPIO_Port, E220_M1_Pin, GPIO_PIN_SET);
 
+  HAL_UART_Transmit(&huart1, conf, 3, 1000);
+
+  if (HAL_GPIO_ReadPin(E220_AUX_GPIO_Port, E220_AUX_Pin) == GPIO_PIN_RESET)
+  {
+	  HAL_UART_Receive(&huart1, resp, (3 + conf[2]), 1000);
+  }
+  else
+  {
+	  while(1);
+  }
+
+  HAL_Delay(20);
+
+  wconf[0] = 0xC0;
+  wconf[1] = 0;
+  wconf[2] = 0x08;
+
+  memcpy(&wconf[3], &resp[3], conf[2]);
+
+  wconf[2 + 5] = 0x12;
+  wconf[2 + 3] = 0x62;
+  wconf[2 + 2] = 0x00;
+
+  memset(resp, 0, sizeof(resp));
+
+  HAL_Delay(5);
+
+  HAL_UART_Transmit(&huart1, wconf, (3 + wconf[2]), 1000);
+
+  if (HAL_GPIO_ReadPin(E220_AUX_GPIO_Port, E220_AUX_Pin) == GPIO_PIN_RESET)
+  {
+	  HAL_UART_Receive(&huart1, resp, (3 + wconf[2]), 1000);
+  }
+  else
+  {
+	  while(1);
+  }
+
+  HAL_GPIO_WritePin(E220_M0_GPIO_Port, E220_M0_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(E220_M1_GPIO_Port, E220_M1_Pin, GPIO_PIN_RESET);
+  HAL_Delay(15);
+
+//  while (HAL_GPIO_ReadPin(E220_AUX_GPIO_Port, E220_AUX_Pin) == GPIO_PIN_RESET);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_GPIO_TogglePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin);
-	  HAL_GPIO_TogglePin(WHITE_LED_GPIO_Port, WHITE_LED_Pin);
+
+	  payload[12] = 0x30 + (count % 10);
+	  HAL_UART_Transmit(&huart1, (uint8_t*)payload, strlen(payload), 1000);
+      count++;
 	  HAL_Delay(500);
     /* USER CODE END WHILE */
 
