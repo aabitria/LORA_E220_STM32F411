@@ -71,6 +71,7 @@ int main(void)
 	uint8_t resp[16] = {0};
 	uint8_t wconf[16] = {0};
 	char payload[20] = "Hello World!";
+	char message[32] = {0};
 	uint8_t count = 0;
 
   /* USER CODE END 1 */
@@ -131,7 +132,9 @@ int main(void)
 
   wconf[2 + 5] = 0x41;
   wconf[2 + 3] = 0x62;
-  wconf[2 + 2] = 0x00;
+  wconf[2 + 1] = 0x00;
+  wconf[2 + 2] = 0x03;
+  wconf[2 + 6] |= (1 << 6);
 
   memset(resp, 0, sizeof(resp));
 
@@ -161,7 +164,11 @@ int main(void)
   {
 
 	  payload[12] = 0x30 + (count % 10);
-	  HAL_UART_Transmit(&huart1, (uint8_t*)payload, strlen(payload), 1000);
+	  message[0] = 0x00;	// ADDRH
+	  message[1] = 0x01;	// ADDRL
+	  message[2] = 0x41;	// CHAN
+	  memcpy(&message[3], payload, strlen(payload));
+	  HAL_UART_Transmit(&huart1, (uint8_t*)message, (3+strlen(payload)), 1000);
       count++;
 	  HAL_Delay(500);
     /* USER CODE END WHILE */
