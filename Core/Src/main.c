@@ -129,7 +129,7 @@ int main(void)
 
   memcpy(&wconf[3], &resp[3], conf[2]);
 
-  wconf[2 + 5] = 0x12;
+  wconf[2 + 5] = 0x41;
   wconf[2 + 3] = 0x62;
   wconf[2 + 2] = 0x00;
 
